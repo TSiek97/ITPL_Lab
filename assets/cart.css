@@ -1,0 +1,28 @@
+.cart-container {
+    padding: 80px;
+}
+.cart-container * {
+    color: var(--main-color);
+    font-size:2rem;
+}
+
+button.order-button {
+    background-color: var(--secondary-color);
+    border: 0px;
+    border-radius: 4px;
+    color: var(--background-color);
+    display: flex;
+    margin: auto;
+    font-size: 2rem;
+}
+.cart-table{
+    margin: auto;
+}
+.total-section {
+    text-align: center;
+}
+
+input.item-quantity {
+    font-size: 2rem;
+    width: 100px;
+}

@@ -1,0 +1,350 @@
+:root {
+    --main-color: #252525;
+    --secondary-color: #4b5479;
+    --background-color: #f3f7ff;
+    --font-family: Arial, sans-serif;
+    --box-shadow:rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+/* LOGIN */
+.background-image-container {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+}
+img.background-image {
+    height: 151%;
+}
+img.login-image {
+    max-width: 70%;
+    /* border-radius: 24px;
+    background-color: var(--background-color); */
+    margin: auto;
+}
+.login-logo {
+    margin: auto;
+    display: flex;
+    position: absolute;
+    width: calc(50% - 80px);
+    height: calc(100% - 160px);
+}
+div#login-column-1 {
+    border-radius: 15px;
+    /* background-color:  var(--background-color);
+    background: url(images/background-image.jpg); */
+}
+.login-wrapper {
+    width: calc(100% - 160px);
+    height: calc(100% - 160px);
+    padding: 80px !important;
+    display: flex;
+    background-color: var(--background-color);
+}
+.login-container{
+    width: 100%;
+    height: 100%;
+    background-color: var(--secondary-color);
+    display: flex;
+    flex-direction: row;
+    border-radius: 24px;
+    padding: 12px;
+    box-shadow: var(--box-shadow);
+}
+.login-column{
+    display:flex;
+    width:50%;
+}
+form.login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: auto;
+}
+.login-form-container {
+    display: flex;
+    flex-direction: column;
+}
+.login-form button{
+    font-size: 2rem;
+    border-radius: 4px;
+    border-width: 0px;
+    background-color: var(--main-color);
+}
+.login-form a{
+    color:var(--background-color)
+}
+.login-form input, .login-form .psw{
+    font-size:1.5rem;
+
+}
+.login-form label {
+    font-size:3rem;
+    font-weight:bold
+}
+div#login-column-2 {
+    /* border: 2px solid var(--main-color); */
+    border-radius: 15px;
+}
+/* LOGIN ENDE */
+
+#header-wrapper {
+    display: flex;
+    flex-direction: column; /* Make children stack vertically */
+     /* Set height of parent container */
+
+}
+html, body {
+    height: 100%;
+    margin: 0;
+    color: var(--main-color);
+    font-family:var(--font-family)
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+img.logo-header {
+    height: 100px;
+    margin-top: 8px;
+}
+#header-wrapper {
+
+    background-color: var(--background-color);
+    color: var(--main-color);
+    padding: 10px;
+    /* border-bottom:2px solid var(--main-color) */
+    box-shadow: var(--box-shadow);
+}
+
+#content-wrapper {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x:visible;
+}
+
+#footer-wrapper {
+    background-color: var(--background-color);
+    color: var(--main-color);
+    padding: 10px;
+    box-shadow: var(--box-shadow);
+}
+#footer-wrapper .hs-flex{
+    height:30px;
+}
+/* Style for hr elements */
+#header-wrapper + hr, #content-wrapper + hr {
+    border: 0;
+    height: 1px;
+    background-color: var(--background-color);
+    margin: 0;
+}
+
+.vs-container {
+    flex-grow: 1; /* Allow the container to grow and fill available space */
+
+}
+.hs-container {
+    width: 100%;
+    display: flex; /* Use Flexbox */
+    justify-content: space-between; /* Adjust alignment as needed */
+
+    box-sizing: border-box;
+}
+.hs-flex {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.hs-flex li {
+    flex-grow: 1; /* Each child will take up equal space */
+    padding: 2px; /* Adjust spacing as needed */
+
+    text-align: center; /* Center the text horizontally */
+
+}
+.trademark-p{
+    padding:1px;
+    height:fit-content;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.account-options, .logo, #footer-wrapper{
+    font-size:1.5rem
+}
+.main-page-navigation{
+    font-size:3rem;
+    font-weight: bold;
+    
+}
+a{
+    color:var(--main-color);
+    text-decoration: none;
+}
+
+
+a:hover, a.active {
+    text-decoration: underline;
+    color: var(--secondary-color);
+}
+
+/* */
+
+.toggle-input {
+    display: none;
+  }
+  
+.clickable-container {
+cursor: pointer;
+}
+
+.grid-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+/* border: 2px solid var(--main-color); */
+box-shadow: var(--box-shadow);
+border-radius:3px;
+margin-bottom: 10px;
+}
+
+.toggle-label {
+display: none; /* Hide the label */
+}
+
+.grid-content {
+display: flex;
+justify-content: space-between;
+width: 100%;
+background-color: var(--background-color);
+font-size: 1.5rem;
+font-weight:200;
+}
+
+.grid-row {
+    display: flex; /* Change from flex to block */
+    width:100%;
+
+
+  }
+
+.grid-item {
+/* flex: 0 0 15%; 
+padding: 6px;
+margin: 2px;
+text-align: center; */
+display: flex;
+justify-content: space-evenly;
+width: 100%;
+margin: 10px;
+}
+  
+
+
+.hidden-content {
+display: none;
+width: 100%;
+}
+
+.toggle-input:checked ~ .grid-container .hidden-content {
+display: flex;
+flex-direction:column;
+justify-content: space-between;
+}
+.clickable-container{
+    margin-bottom:3px;
+}
+.grid-content-header{
+    font-size: 1.5rem;
+    font-weight:200;
+    margin-bottom:5px;
+    background-color: transparent;
+
+}
+
+
+/* filter products */
+
+.filter-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px; /* Adjust as needed */
+  }
+  
+  .filter-input,
+  .filter-select {
+    margin: 0 10px; /* Adjust as needed */
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+  
+  .filter-select {
+    width: 250px; /* Adjust as needed */
+  }
+
+  .filter-card {
+    display: none;
+    position: absolute;
+    top: 205px;
+    transform: translateX(200px);
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+  .backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+  }
+  
+  /* .filter-card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    z-index: 100; 
+  } */
+  button.button-style-1 {
+    background-color: var(--secondary-color);
+    border: 0px;
+    border-radius: 4px;
+    color: var(--background-color);
+    font-size: 1.5rem;
+    padding: 3px;
+}
+div#filterCard * {
+    padding: 0px;
+    margin: 3px;
+}
+div#filterCard h3 {
+    font-size: 3rem;
+}
+div#filterCard h4 {
+    font-size: 2rem;
+}
+div#filterCard label {
+    font-size: 1.5rem;
+}
+/* filter products END*/
+
+
