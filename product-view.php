@@ -6,20 +6,20 @@ if (!isset($_GET['product'])) {
 } else {
     $productNummer = $_GET['product'];
 
-    //session_start();
-    
+    // session_start(); // Commented out as it's already started in header
+
     if (isset($_SESSION['userType'])) {
         $userType = $_SESSION['userType'];
         $userID = $_SESSION['userID']; 
     }
-    require_once "db_class.php";
-    $DBServer   = 'localhost';
-    $DBHost     = 'airlimited';
-    $DBUser     = 'root';
-    $DBPassword = '';
+    // require_once "db_class.php";
+    // $DBServer   = 'localhost';
+    // $DBHost     = 'airlimited';
+    // $DBUser     = 'root';
+    // $DBPassword = '';
 
-    $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-    $db->connect();
+    // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
+    // $db->connect();
     $query_product = "
         SELECT artikel.artikelnummer, artikel.artikelbezeichnung, artikel.laenge, artikel.breite, artikel.hoehe, artikel.gewicht, artikel.einzelpreis, artikel.fertigungsart,
                SUM(lagerplatz.Menge) AS Menge
@@ -83,30 +83,72 @@ if (!isset($_GET['product'])) {
         <p><?php echo $laenge != '' && $breite != '' && $hoehe != '' && $gewicht != '' ? $laenge . ' cm x ' . $breite . ' cm x ' . $hoehe . ' cm  Gewicht: ' . $gewicht . ' kg' : 'HxBxL Gewicht'; ?></p>
         <hr>
         <?php
-        if (isset($_SESSION['userType']) && $_SESSION['userType'] == 'mitarbeiter') {
-            // Display Fertigungsart for 'mitarbeiter'
-            echo '<h2>Fertigungsart</h2>';
-            echo '<p>' . $fertigungsart . '</p>';
-        } else {
-            // Display the add-to-cart form for other users
-            ?>
-            <form action="/add-to-cart" method="post" class="add-to-cart-form">
-                <div class="form-row">
-                    <div class="col-30">
-                        <input type="number" name="quantity" class="form-control" value="1" min="1">
+        if (isset($_SESSION['userType'])) {
+            if ($_SESSION['userType'] == 'mitarbeiter' || $_SESSION['userType'] == 'management') {
+                // Display Fertigungsart for 'mitarbeiter' and 'management'
+                echo '<h2>Fertigungsart</h2>';
+                echo '<p>' . $fertigungsart . '</p>';
+            }
+            if ($_SESSION['userType'] == 'management') {
+                echo '<hr>';
+                ?>
+                <h2>Fertigungsauftrag erstellen</h2>
+                <form action="" method="post" class="production-order-form">
+                    <div class="form-row">
+                        <div class="col-30">
+                            <label for="quantity">Menge:</label>
+                            <input type="number" name="quantity" class="form-control" value="1" min="1">
+                            <input type="hidden" name="artikelnummer" value="<?php echo $artikelnummer; ?>">
+                        </div>
+                        <div class="col-30">
+                            <label for="priority">Priorität:</label>
+                            <select name="priority" class="form-control">
+                                <option value="Niedrig">Niedrig</option>
+                                <option value="Mittel">Mittel</option>
+                                <option value="Hoch">Hoch</option>
+                            </select>
+                        </div>
+                        <div class="col-40">
+                            <button type="submit" class="btn btn-primary create-production-order-btn">
+                                <h2>Fertigungsauftrag hinzufügen</h2>
+                                <span class="mdi--cart"></span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-70">
-                        <button type="submit" class="btn btn-primary add-to-cart-btn">
-                            <h2>hinzufügen</h2>
-                            <span class="mdi--cart"></span>
-                        </button>
+                </form>
+                <?php
+                if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['artikelnummer']) && isset($_POST['quantity']) && isset($_POST['priority'])) {
+                    require_once 'functions/production-orders_functions.php';
+                    $artikelnummer = $_POST['artikelnummer'];
+                    $quantity = $_POST['quantity'];
+                    $priority = $_POST['priority'];
+                    createProductionOrder($artikelnummer, $quantity, $priority);
+               
+                }
+            }
+            if ($_SESSION['userType'] == 'servicepartner') //|| $_SESSION['userType'] == 'management')
+             {
+                // Display Add to Cart for 'servicepartner' and 'management'
+                ?>
+                <form action="/functions/add-to-cart.php" method="post" class="add-to-cart-form">
+                    <div class="form-row">
+                        <div class="col-30">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1">
+                            <input type="hidden" name="artikelnummer" value="<?php echo $artikelnummer; ?>">
+                        </div>
+                        <div class="col-70">
+                            <button type="submit" class="btn btn-primary add-to-cart-btn">
+                                <h2>hinzufügen</h2>
+                                <span class="mdi--cart"></span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
-            <?php
+                </form>
+                <?php
+            }
         }
         ?>
     </div>
 </div>
 
-<?php include 'footer.php'?>
+<?php include 'footer.php' ?>

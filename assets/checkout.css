@@ -1,0 +1,96 @@
+.checkout-container {
+    display: flex;
+    padding: 20px;
+    justify-content: space-evenly;
+}
+/* .column {
+    flex: 1;
+    margin: 0 10px;
+    width: 50%;
+} */
+.order-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+    font-size: 1.2em;
+}
+.order-item img {
+    width: 100px;
+    height: auto;
+    margin-right: 20px;
+}
+.order-item h3 {
+    margin: 0 20px 0 0;
+    flex: 1;
+}
+.order-item form {
+    display: flex;
+    align-items: center;
+}
+.order-item form input[type="number"] {
+    width: 60px;
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+.order-item form button,
+.order-item .remove-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+.order-item .remove-button {
+    margin-left: 10px;
+}
+#checkout-order-summary {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1.2em;
+}
+#checkout-order-summary h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+#checkout-order-summary form {
+    display: flex;
+    flex-direction: column;
+}
+#checkout-order-summary form label {
+    margin: 10px 0 5px;
+    font-size: 1.2em;
+}
+#checkout-order-summary form input,
+#checkout-order-summary form button {
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+#checkout-order-summary form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.address-form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.address-form-row label {
+    flex: 1;
+    padding-right:5px;
+}
+.address-form-row input {
+    flex: 2;
+    padding: 10px;
+    font-size: 1.2em;
+}
+
+#checkout-order-summary form button:disabled {
+    opacity: 0.5;
+    background-color: grey;
+}

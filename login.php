@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php include 'templates/header.php'; ?>
+<?php include 'components/header.php'; ?>
 <body>
 <div id="container">
     <div class="login-wrapper">
@@ -75,14 +75,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_PO
             $userID = $row->Bearbeiternummer; // Accessing the property directly
         } else {
             // Check 'mitarbeiter' table
-            $query = "SELECT * FROM mitarbeiter WHERE Kennung = '$uname'";
+            $query = "SELECT Mitarbeiternummer, Rechte FROM mitarbeiter WHERE Kennung = '$uname'";
             $result = $db->getEntityArray($query);
             
             if (!empty($result)) {
                 // User found in the 'mitarbeiter' table
-                $userType = "mitarbeiter";
+
+               
                 $row = $result[0]; // Assuming only one row is returned
                 $userID = $row->Mitarbeiternummer; // Accessing the property directly
+                $rechte = $row->Rechte;
+
+                if ($rechte === 'management') {
+                    $userType = "management";
+                } else {
+                    $userType = "mitarbeiter";
+                }
             } else {
                 // User not found, handle login failure
                 echo "Benutzer nicht gefunden.";

@@ -6,17 +6,17 @@
 <hr>
 
 <div id='footer-wrapper'>
-<?php include 'templates/footer.php'?>
+<?php include 'components/footer.php'?>
 </div>
 
 </div>
 <script>
-function toggleCheckbox(checkboxId, contentId) {
-    var checkbox = document.getElementById(checkboxId);
-    var content = document.getElementById(contentId);
-    checkbox.checked = !checkbox.checked;
-    content.style.display = checkbox.checked ? "block" : "none";
-  }
+    function toggleCheckbox(checkboxId, contentId) {
+        var checkbox = document.getElementById(checkboxId);
+        var content = document.getElementById(contentId);
+        checkbox.checked = !checkbox.checked;
+        content.style.display = checkbox.checked ? "block" : "none";
+    }
 
     function loadContent(page) {
         var xhttp = new XMLHttpRequest();
@@ -29,10 +29,10 @@ function toggleCheckbox(checkboxId, contentId) {
         xhttp.send();
     }
 
-    // Load initial content when the page loads
-    document.addEventListener("DOMContentLoaded", function() {
-        loadContent('templates/produkte.php');
-    });
+    // // Load initial content when the page loads
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     loadContent('templates/produkte.php');
+    // });
       
 
 

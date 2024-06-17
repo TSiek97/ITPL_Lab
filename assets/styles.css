@@ -132,9 +132,7 @@ img.logo-header {
     padding: 10px;
     box-shadow: var(--box-shadow);
 }
-#footer-wrapper .hs-flex{
-    height:30px;
-}
+
 /* Style for hr elements */
 #header-wrapper + hr, #content-wrapper + hr {
     border: 0;
@@ -245,6 +243,7 @@ display: flex;
 justify-content: space-evenly;
 width: 100%;
 margin: 10px;
+overflow:hidden;
 }
   
 
