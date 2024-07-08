@@ -1,13 +1,14 @@
 <?php
 
 require_once "db_class.php";
-
+require_once "order_functions.php";
+// Function to create a new production order
 function createProductionOrder($artikelnummer, $quantity, $priority) {
     global $db;
-    
+
     $fertigungsziel = 'Lager';
-    $status = 10;  // Default status
-    $auftragseingang = date('Y-m-d');  // Today's date
+    $status = 10; // Default status
+    $auftragseingang = date('Y-m-d'); // Today's date
 
     $query = "
         INSERT INTO fertigungsauftraege (Artikelnummer, Menge, Fertigungsziel, Status, Prio, Auftragseingang) 
@@ -21,8 +22,8 @@ function createProductionOrder($artikelnummer, $quantity, $priority) {
     }
 }
 
-// Existing functions for managing production orders
-function completeOrder($orderId) {
+// Function to complete a production order
+function completeProdOrder($orderId) {
     global $db;
 
     // Update fertigungsauftraege table
@@ -83,21 +84,27 @@ function completeOrder($orderId) {
                       VALUES (9, 'FA', '01', $nextRegalnummer, '$nextFachnummer', $artikelnummer, $menge, 0)";
             $db->query($query);
         }
+
+        // Update teilauftraege status based on stock changes
+        updateTeilauftraegeStatus($artikelnummer);
     }
 }
 
 
-function cancelOrder($orderId) {
+// Function to cancel a production order
+function cancelProdOrder($orderId) {
     global $db;
+
     $query = "UPDATE fertigungsauftraege SET status = 80 WHERE fertigungsnummer = $orderId";
     $db->query($query);
 }
 
+// Function to change the priority of a production order
 function changePriority($orderId, $newPriority) {
     global $db;
-    $query = "UPDATE fertigungsauftraege SET 
-    prio = '$newPriority' 
-    WHERE fertigungsnummer = $orderId";
+
+    $query = "UPDATE fertigungsauftraege SET prio = '$newPriority' WHERE fertigungsnummer = $orderId";
     $db->query($query);
 }
+
 ?>
