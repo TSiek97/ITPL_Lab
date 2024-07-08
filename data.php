@@ -406,3 +406,15 @@ if (isset($_SESSION['last_query'])): ?>
 <?php
 include 'footer.php';
 ?>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInputs = document.querySelectorAll('.table-filter-input');
+            filterInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set(this.name, this.value);
+                    window.location.search = params.toString();
+                });
+            });
+        });
+    </script>
