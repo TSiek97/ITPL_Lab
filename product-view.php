@@ -59,6 +59,15 @@ if (!isset($_GET['product'])) {
     } else {
         $artikelimage = 'product-pictures/' . $artikelnummer . '.jpg';
     }
+
+    // Get the list of storage locations and quantities for the product
+    $query_lagerplaetze = "
+        SELECT lagerplatz.Lagernummer, lagerplatz.Bereich, lagerplatz.Gang, lagerplatz.Regalnummer, lagerplatz.Fachnummer, lagerplatz.Menge
+        FROM lagerplatz
+        WHERE lagerplatz.artikelnummer = $productNummer
+    ";
+
+    $lagerplaetze = $db->getEntityArray($query_lagerplaetze);
 }
 ?>
 
@@ -84,10 +93,18 @@ if (!isset($_GET['product'])) {
         <hr>
         <?php
         if (isset($_SESSION['userType'])) {
-            if ($_SESSION['userType'] == 'mitarbeiter' || $_SESSION['userType'] == 'management') {
-                // Display Fertigungsart for 'mitarbeiter' and 'management'
+            if ($_SESSION['userType'] == 'fertigung' || $_SESSION['userType'] == 'management') {
+                // Display Fertigungsart for 'fertigung' and 'management'
                 echo '<h2>Fertigungsart</h2>';
                 echo '<p>' . $fertigungsart . '</p>';
+            }
+            if ($_SESSION['userType'] == 'management' || $_SESSION['userType'] == 'lager') {
+                // Display the list of storage locations and quantities for 'management' and 'lager'
+                echo '<hr>';
+                echo '<h2>Lagerplätze und Mengen</h2>';
+                foreach ($lagerplaetze as $lagerplatz) {
+                    echo '<p>Lagernummer: ' . $lagerplatz->Lagernummer . ', Bereich: ' . $lagerplatz->Bereich . ', Gang: ' . $lagerplatz->Gang . ', Regalnummer: ' . $lagerplatz->Regalnummer . ', Fachnummer: ' . $lagerplatz->Fachnummer . ', Menge: ' . $lagerplatz->Menge . ' stk.</p>';
+                }
             }
             if ($_SESSION['userType'] == 'management') {
                 echo '<hr>';
@@ -110,8 +127,8 @@ if (!isset($_GET['product'])) {
                         </div>
                         <div class="col-40">
                             <button type="submit" class="btn btn-primary create-production-order-btn">
-                                <h2>Fertigungsauftrag hinzufügen</h2>
-                                <span class="mdi--cart"></span>
+                                <h4>Fertigungsauftrag hinzufügen</h4>
+                                <!-- <span class="mdi--cart"></span> -->
                             </button>
                         </div>
                     </div>
@@ -123,7 +140,6 @@ if (!isset($_GET['product'])) {
                     $quantity = $_POST['quantity'];
                     $priority = $_POST['priority'];
                     createProductionOrder($artikelnummer, $quantity, $priority);
-               
                 }
             }
             if ($_SESSION['userType'] == 'servicepartner') //|| $_SESSION['userType'] == 'management')
@@ -138,7 +154,7 @@ if (!isset($_GET['product'])) {
                         </div>
                         <div class="col-70">
                             <button type="submit" class="btn btn-primary add-to-cart-btn">
-                                <h2>hinzufügen</h2>
+                                
                                 <span class="mdi--cart"></span>
                             </button>
                         </div>

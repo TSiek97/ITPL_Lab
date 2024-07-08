@@ -1,0 +1,122 @@
+/* Navigation styles */
+/* .hs-flex.main-page-navigation {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.hs-flex.main-page-navigation li {
+    display: inline;
+}
+
+.hs-flex.main-page-navigation a {
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+}
+
+.hs-flex.main-page-navigation a:hover {
+    background-color: #0056b3;
+} */
+
+/* Filter form styles */
+.filter-form {
+    margin-bottom: 20px;
+}
+
+.filter-form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.filter-form input {
+    margin-left: 10px;
+}
+
+/* Table styles */
+.data-management-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.data-management-table, 
+.data-management-table th, 
+.data-management-table td {
+    border: 1px solid var(--main-color);
+}
+
+.data-management-table th, 
+.data-management-table td {
+    padding: 10px;
+    text-align: center;
+}
+
+.data-management-table-filter-row {
+    background-color: var(--background-color);
+}
+
+.table-filter-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+/* table */
+
+table.data-management-table {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+  }
+  table.data-management-table td, table.data-management-table th {
+    border: 0px solid var(--background-color);
+    padding: 3px 2px;
+  }
+  table.data-management-table tr:nth-child(even) {
+    background: var(--background-color);
+  }
+  table.data-management-table thead {
+    background: var(--main-color);
+  
+  }
+  table.data-management-table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+    border-left: 2px solid var(--background-color);
+  }
+  table.data-management-table thead th:first-child {
+    border-left: none;
+  }
+  
+  table.data-management-table tfoot td {
+    font-size: 14px;
+  }
+  table.data-management-table tfoot .links {
+    text-align: right;
+  }
+  table.data-management-table tfoot .links a{
+    display: inline-block;
+    background: var(--secondary-color);
+    color: var(--background-color);
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  .data-management-table td > * {
+    border: none;
+    background-color: transparent;
+}
+
+.data-management-table select:hover {
+    transform: scale(0.95);
+    text-shadow: 0 0 5px var(--secondary-color);
+}
+.data-management-table input:hover {
+    transform: scale(0.95);
+    text-shadow: 0 0 5px var(--secondary-color);
+}

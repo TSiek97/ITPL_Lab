@@ -53,7 +53,7 @@ function add_auftrag($kundennummer, $name, $address, $zip, $orderItems) {
     }
 
     $lieferdatum = $all_in_stock ? date('Y-m-d', strtotime('+3 days')) : date('Y-m-d', strtotime('+14 days'));
-    $auftrag_status = $all_in_stock ? 70 : 10;
+    $auftrag_status = $all_in_stock ? 20 : 10;
 
     // Create new auftrag
     $address = $db->get_escape_string($address);
@@ -80,7 +80,7 @@ function add_auftrag($kundennummer, $name, $address, $zip, $orderItems) {
         if ($auftrag_status == 70) {
             $teilauftrag_status = 70;
         } else {
-            $teilauftrag_status = ($productInfo->Menge >= $item->Menge) ? 30 : 10;
+            $teilauftrag_status = ($productInfo->Menge >= $item->Menge) ? 20 : 10;
         }
         $query_add_position = "
             INSERT INTO auftragsposition (Auftragsnummer, Position, Teilauftrag, Artikelnummer, Menge, Kaufpreis, Status, Abschlussdatum)

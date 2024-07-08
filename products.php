@@ -9,14 +9,14 @@
         <form id="filterForm" method="GET" action="">
             <h4>Kategorien</h4>
             <?php
-            require_once "db_class.php";
-            $DBServer   = 'localhost';
-            $DBHost     = 'airlimited';
-            $DBUser     = 'root';
-            $DBPassword = '';
+            // require_once "db_class.php";
+            // $DBServer   = 'localhost';
+            // $DBHost     = 'airlimited';
+            // $DBUser     = 'root';
+            // $DBPassword = '';
 
-            $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-            $db->connect();
+            // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
+            // $db->connect();
             $query_categories = 'SELECT DISTINCT Kategorie FROM artikel;';
             $categories = $db->getEntityArray($query_categories);
 

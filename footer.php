@@ -1,12 +1,13 @@
 </div>
 
 
-</div>
 
 <hr>
 
 <div id='footer-wrapper'>
 <?php include 'components/footer.php'?>
+</div>
+
 </div>
 
 </div>

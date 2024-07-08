@@ -48,7 +48,7 @@ $DBPassword = '';
 // Create a database connection
 $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
 $db->connect();
-
+$userName = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_POST['psw'])) {
     // Retrieve username/email and password from the login form
     $uname = $_POST['uname'];
@@ -73,9 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_PO
             $userType = "servicepartner";
             $row = $result[0]; // Assuming only one row is returned
             $userID = $row->Bearbeiternummer; // Accessing the property directly
+            $userName = $row->Firmenname;
         } else {
             // Check 'mitarbeiter' table
-            $query = "SELECT Mitarbeiternummer, Rechte FROM mitarbeiter WHERE Kennung = '$uname'";
+            $query = "SELECT Mitarbeiternummer, Rechte, Vorname, Nachname FROM mitarbeiter WHERE Kennung = '$uname'";
             $result = $db->getEntityArray($query);
             
             if (!empty($result)) {
@@ -85,11 +86,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_PO
                 $row = $result[0]; // Assuming only one row is returned
                 $userID = $row->Mitarbeiternummer; // Accessing the property directly
                 $rechte = $row->Rechte;
-
+                $userName = (string)$row->Vorname . ' ' . (string)$row->Nachname;
                 if ($rechte === 'management') {
                     $userType = "management";
-                } else {
-                    $userType = "mitarbeiter";
+                } 
+                else if ($rechte === 'fertigung'){
+                    $userType = "fertigung";
+                }
+                else if ($rechte === 'lager'){
+                    $userType = "lager";
                 }
             } else {
                 // User not found, handle login failure
@@ -102,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_PO
     if (isset($userType) && isset($userID)) {
         $_SESSION['userType'] = $userType;
         $_SESSION['userID'] = $userID;
+        $_SESSION['userName'] = $userName;
         // Redirect to home page or any other page
         header("Location: home.php");
         exit();

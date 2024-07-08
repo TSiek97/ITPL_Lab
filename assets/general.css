@@ -1,0 +1,29 @@
+/* General button styles */
+button {
+    cursor: pointer!important;
+    transition: background-color 0.3s, transform 0.1s!important;
+}
+
+/* Hover effect */
+button:hover {
+    background-color: var(--secondary-color)!important;
+    border-radius:2px;
+    color : var(--background-color);
+    /* background-color: grey; */
+}
+button>*:hover {
+    /* background-color: var(--secondary-color)!important; */
+    border-radius:2px!important;
+    color : var(--background-color)!important;
+    /* background-color: grey; */
+}
+/* Click (active) effect */
+button:active {
+    transform: scale(0.95)!important;
+}
+
+/* Focus effect for accessibility */
+button:focus {
+    /* outline: none; */
+    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4)!important;
+}

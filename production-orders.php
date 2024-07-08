@@ -26,10 +26,10 @@ if (isset($_SESSION['userType'])) {
             $orderId = $_POST['order_id'];
             if ($_POST['action'] === 'complete') {
                 // Call a function to complete the order
-                completeOrder($orderId);
+                completeProdOrder($orderId);
             } elseif ($_POST['action'] === 'cancel' && $userType == 'management') {
                 // Call a function to cancel the order
-                cancelOrder($orderId);
+                cancelProdOrder($orderId);
             } elseif ($_POST['action'] === 'change_priority' && $userType == 'management') {
                 // Call a function to change the priority
                 $newPriority = $_POST['new_priority'];
@@ -39,7 +39,7 @@ if (isset($_SESSION['userType'])) {
     }
 
     // Check userType and retrieve data accordingly
-    if ($userType == "mitarbeiter" || $userType == "management") {
+    if ($userType == "fertigung" || $userType == "management") {
         echo '<div class="grid-content grid-content-header">';
         echo '    <div class="grid-item">Fertigungs Nr.</div>';
         echo '    <div class="grid-item">Artikel</div>';
@@ -63,6 +63,7 @@ if (isset($_SESSION['userType'])) {
                 fertigungsauftraege.auftragseingang,
                 fertigungsauftraege.prio,
                 artikel.artikelbezeichnung, 
+                artikel.artikelnummer,
                 artikel.Fertigungsart,
                 statusbeschreibung.beschreibung 
             FROM fertigungsauftraege 
@@ -133,10 +134,10 @@ if (isset($_SESSION['userType'])) {
                 echo '<form method="POST" action="">';
                 echo '<input type="hidden" name="order_id" value="' . $data->fertigungsnummer . '">';
                 if ($data->beschreibung != "abgeschlossen" && $data->beschreibung != "storniert") {
-                    echo '<button type="submit" name="action" value="complete">Abgeschlossen</button>';
+                    echo '<button class="round-checkmark" type="submit" name="action" value="complete"></button>';
                 }
                     if ($userType == "management" && $data->beschreibung != "abgeschlossen" && $data->beschreibung != "storniert") {
-                    echo '<button type="submit" name="action" value="cancel">Stornieren</button>';
+                    echo '<button class="round-cancel" type="submit" name="action" value="cancel"></button>';
                 }
                 echo '</form>';
               

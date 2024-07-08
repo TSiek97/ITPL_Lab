@@ -76,3 +76,21 @@ div#product-view-container-col-2 {
 .add-to-cart-form button.btn.btn-primary.add-to-cart-btn h2 {
     line-height: 28px;
 } 
+.production-order-form > .form-row {
+    display: inline-flex;
+    align-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+}
+.production-order-form > .form-row > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    
+}
+button.btn.btn-primary.create-production-order-btn {
+    background-color: transparent;
+    border: 1px solid grey;
+    border-radius: 2px;
+}
