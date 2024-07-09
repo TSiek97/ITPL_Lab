@@ -4,16 +4,20 @@ require_once 'cart_functions.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+/**
+ * Function to add a new order (auftrag) to the database.
+ *
+ * @param int $kundennummer The customer number.
+ * @param string $name The name of the customer.
+ * @param string $address The address for delivery.
+ * @param string $zip The postal code for delivery.
+ * @param array $orderItems The items in the order.
+ * @return int The order number (auftragsnummer) of the newly created order.
+ * @throws Exception If the postal code or customer number is invalid.
+ */
 function add_auftrag($kundennummer, $name, $address, $zip, $orderItems) {
-    // // Database connection details
-    // $DBServer   = 'localhost';
-    // $DBHost     = 'airlimited';
-    // $DBUser     = 'root';
-    // $DBPassword = '';
-    // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-    // $db->connect();
     global $db;
-    
     $servicepartnernummer = $_SESSION['userID'];
 
     // Verify if the zip code exists in the ort table
@@ -95,15 +99,15 @@ function add_auftrag($kundennummer, $name, $address, $zip, $orderItems) {
     return $auftragsnummer;
 }
 
+/**
+ * Function to clear the cart for a specific service partner.
+ *
+ * @param int $servicepartnernummer The service partner number.
+ */
 function clear_cart($servicepartnernummer) {
-    // Database connection details
-    // $DBServer   = 'localhost';
-    // $DBHost     = 'airlimited';
-    // $DBUser     = 'root';
-    // $DBPassword = '';
-    // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-    // $db->connect();
     global $db;
+
+    // SQL query to delete all items in the cart for the service partner
     $query_clear_cart = "
         DELETE FROM warenkorb
         WHERE Servicepartnernummer = $servicepartnernummer

@@ -1,24 +1,14 @@
 <?php
-include 'header.php';
-require_once 'functions/production-orders_functions.php';
+include 'header.php'; // Include the header component
+require_once 'functions/production-orders_functions.php'; // Include production orders functions
 
-// Start session
+// Start session (already started in the header)
 //session_start();
 
 // Check if userType is set in the session
 if (isset($_SESSION['userType'])) {
     $userType = $_SESSION['userType'];
     $userID = $_SESSION['userID']; // Assuming you also need userID for further processing
-    
-    // // Database connection parameters
-    // $DBServer   = 'localhost';
-    // $DBHost     = 'airlimited';
-    // $DBUser     = 'root';
-    // $DBPassword = '';
-
-    // // Create a database connection
-    // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-    // $db->connect();
 
     // Handle form submission for completing, canceling orders, or changing priority
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,6 +30,7 @@ if (isset($_SESSION['userType'])) {
 
     // Check userType and retrieve data accordingly
     if ($userType == "fertigung" || $userType == "management") {
+        // Display grid headers for production orders overview
         echo '<div class="grid-content grid-content-header">';
         echo '    <div class="grid-item">Fertigungs Nr.</div>';
         echo '    <div class="grid-item">Artikel</div>';
@@ -53,7 +44,7 @@ if (isset($_SESSION['userType'])) {
         echo '    <div class="grid-item">Aktionen</div>';
         echo '</div>';
 
-        // Get data for Fertigungsübersicht
+        // Query to get data for production orders overview
         $query_fertigungsaufträge = "
             SELECT 
                 fertigungsauftraege.fertigungsnummer, 
@@ -90,7 +81,6 @@ if (isset($_SESSION['userType'])) {
                 END ASC,
                 auftragseingang DESC";
 
-
         $fertigungsuebersicht_data = $db->getEntityArray($query_fertigungsaufträge);
         if (is_array($fertigungsuebersicht_data)) {
             // Proceed with processing the data
@@ -100,7 +90,7 @@ if (isset($_SESSION['userType'])) {
             $fertigungsuebersicht_data = []; // Set a default empty array
         }
         if (!empty($fertigungsuebersicht_data)) {
-            // Loop through $fertigungsuebersicht_data
+            // Loop through $fertigungsuebersicht_data to display production orders
             foreach ($fertigungsuebersicht_data as $data) {
                 echo '<div class="clickable-container">';
                 echo '<div class="grid-container">';
@@ -136,11 +126,10 @@ if (isset($_SESSION['userType'])) {
                 if ($data->beschreibung != "abgeschlossen" && $data->beschreibung != "storniert") {
                     echo '<button class="round-checkmark" type="submit" name="action" value="complete"></button>';
                 }
-                    if ($userType == "management" && $data->beschreibung != "abgeschlossen" && $data->beschreibung != "storniert") {
+                if ($userType == "management" && $data->beschreibung != "abgeschlossen" && $data->beschreibung != "storniert") {
                     echo '<button class="round-cancel" type="submit" name="action" value="cancel"></button>';
                 }
                 echo '</form>';
-              
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
@@ -151,6 +140,7 @@ if (isset($_SESSION['userType'])) {
             echo "No data available.";
         }
     } else {
+        // Handle unauthorized access
         echo "Unauthorized access.";
     }
 } else {
@@ -158,6 +148,5 @@ if (isset($_SESSION['userType'])) {
     echo "UserType not found in session.";
 }
 
-
-include 'footer.php';
+include 'footer.php'; // Include the footer component
 ?>

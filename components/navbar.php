@@ -8,8 +8,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $userType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 $userName = isset($_SESSION['userName']) ? $_SESSION['userName'] : '';
 
+// Initialize userdata variable
 $userdata = '';
 
+// Set userdata based on userType
 if (in_array($userType, ['management', 'lager', 'fertigung'])) {
     $userdata = 'mitarbeiter';
 } elseif ($userType === 'servicepartner') {
@@ -21,15 +23,17 @@ if (in_array($userType, ['management', 'lager', 'fertigung'])) {
     <div class="vs-container">
         <div class="hs-flex">
             <div class="logo">
+                <!-- Logo image -->
                 <img class='logo-header' src="/assets/images/Logo.png" alt="">
             </div>
             <h2>Willkommen zurück <?php echo $userName?>!</h2>
            
-         
             <div class="account-options">
+                <!-- Show cart icon only for servicepartner -->
                 <?php if ($userType == "servicepartner"): ?>
                     <a href="checkout.php"><span class="mdi--cart"></span></a>
                 <?php endif; ?>
+                <!-- User and logout icons -->
                 <a href="data.php?table=<?php echo $userdata; ?>"><span class="mdi--user"></span></a>
                 <a href="logout.php"><span class="mdi--logout"></span></a>
             </div>
@@ -37,6 +41,7 @@ if (in_array($userType, ['management', 'lager', 'fertigung'])) {
         <br>
         <nav>
             <ul class="hs-flex main-page-navigation">
+                <!-- Navigation links with active class for current page -->
                 <li><a href="home.php" class="<?php echo $current_page == 'home.php' ? 'active' : ''; ?>">Startseite</a></li>
                 <?php if ($userType == 'management' || $userType == 'servicepartner' || $userType == 'lager'): ?>
                     <li><a href="orders.php" class="<?php echo $current_page == 'orders.php' ? 'active' : ''; ?>">Aufträge</a></li>

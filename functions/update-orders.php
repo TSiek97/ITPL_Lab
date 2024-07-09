@@ -1,6 +1,14 @@
 <?php
 
 require_once "db_class.php";
+
+/**
+ * Function to create or update a production order for a given product number and quantity.
+ *
+ * @param int $produktnummer The product number.
+ * @param int $quantity The quantity to be produced.
+ * @return string The status message indicating the result of the operation.
+ */
 function createOrUpdateProductionOrder($produktnummer, $quantity) {
     global $db;
 
@@ -83,6 +91,12 @@ function createOrUpdateProductionOrder($produktnummer, $quantity) {
     }
 }
 
+/**
+ * Function to update production orders based on stock and order requirements.
+ *
+ * @param object $db The database connection object.
+ * @return string A message indicating the status of the update operations.
+ */
 function updateAuftraege($db) {
     // Initialize message variable
     $messages = [];

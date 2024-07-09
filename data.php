@@ -1,11 +1,11 @@
 <?php
-include 'header.php';
-require_once 'db_class.php';
+include 'header.php'; // Include the header component
+require_once 'db_class.php'; // Include the database connection class
 
-
-
+// Get the user type from the session if set
 $userType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 
+// Function to get table definitions based on user type
 function getTableDefinitions($userType) {
     $tableDefinitions = [
         'kunde' => [
@@ -38,7 +38,7 @@ function getTableDefinitions($userType) {
                 'Fachnummer' => ['type' => 'string', 'editable' => true, 'visible' => 'all'],
                 'Artikelnummer' => ['type' => 'int', 'editable' => true, 'visible' => 'all'],
                 'Menge' => ['type' => 'int', 'editable' => true, 'visible' => 'all'],
-                'Menge res' => ['type' => 'int', 'editable' => true, 'visible' => 'all'],
+                // 'Menge res' => ['type' => 'int', 'editable' => true, 'visible' => 'all'], // currently not used!
             ]
         ],
         'lager' => [
@@ -101,7 +101,6 @@ function getTableDefinitions($userType) {
 
     switch ($userType) {
         case 'management':
-            
             // Management can see all as is
             return $tableDefinitions;
         case 'lager':
@@ -112,11 +111,9 @@ function getTableDefinitions($userType) {
             $tables['mitarbeiter']['visible'] = 'self';
             foreach ($tables as &$table) {
                 $table['deletable'] = false;
-         
                 foreach ($table['columns'] as &$column) {
                     $column['editable'] = false;
                 }
-            
             }
             return $tables;
         case 'servicepartner':
@@ -136,8 +133,7 @@ function getTableDefinitions($userType) {
     }
 }
 
-$tableDefinitions = getTableDefinitions($userType);
-// echo print_r($tableDefinitions);
+// Function to get distinct values for dropdowns
 function getDistinctValues($table, $column) {
     global $db;
     $values = [];
@@ -148,6 +144,10 @@ function getDistinctValues($table, $column) {
     return $values;
 }
 
+// Get table definitions based on user type
+$tableDefinitions = getTableDefinitions($userType);
+
+// Determine the current table and allowed filters
 $current_page = basename($_SERVER['PHP_SELF']);
 $allowedTables = array_keys($tableDefinitions);
 $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : (empty($allowedTables) ? '' : $allowedTables[0]);
@@ -159,8 +159,8 @@ foreach ($_GET as $key => $value) {
     }
 }
 
-function buildFilterQuery($filters)
-{
+// Function to build the filter query
+function buildFilterQuery($filters) {
     global $db;
     $filterQuery = '';
     foreach ($filters as $column => $value) {
@@ -169,29 +169,33 @@ function buildFilterQuery($filters)
     return $filterQuery;
 }
 
-function getColumns($table)
-{
+// Function to get the columns of the current table
+function getColumns($table) {
     global $tableDefinitions;
     return array_keys($tableDefinitions[$table]['columns']);
 }
 
+// Get the columns and filter query
 $columns = getColumns($table);
 $filterQuery = buildFilterQuery($filters);
+
+// Fetch the rows of the current table based on filters
 $query = "SELECT * FROM `$table` WHERE 1=1 $filterQuery";
 $rows = $db->getEntityArray($query);
 
+// Handle form submissions for updating, adding, or deleting rows
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     global $db;
     $columns = getColumns($table);
 
     $table = isset($_POST['table']) ? $_POST['table'] : (isset($_GET['table']) ? $_GET['table'] : 'kunde');
     $primaryKeys = isset($tableDefinitions[$table]['primaryKeys']) ? $tableDefinitions[$table]['primaryKeys'] : [];
-    
+
     if (isset($_POST['update'])) {
         $rowIndex = intval($_POST['update']);
         $setClause = [];
         $whereClause = [];
-        
+
         foreach ($columns as $column) {
             if ($tableDefinitions[$table]['columns'][$column]['editable']) {
                 $setClause[] = "`$column` = '" . $db->get_escape_string($_POST[$column][$rowIndex]) . "'";
@@ -200,16 +204,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($primaryKeys as $primaryKey) {
             $whereClause[] = "`$primaryKey` = '" . $db->get_escape_string($_POST['primaryKey'][$primaryKey][$rowIndex]) . "'";
         }
-        
+
         $query = "UPDATE `$table` SET " . implode(', ', $setClause) . " WHERE " . implode(' AND ', $whereClause);
         $_SESSION['last_query'] = $query;
         $db->query($query);
     }
-    
+
     if (isset($_POST['add'])) {
         $columnsValues = [];
         $primaryKeys = $tableDefinitions[$table]['primaryKeys'];
-        
+
         // Get the index of the last row (which is the row for adding new entries)
         $firstEditableColumn = null;
         foreach ($columns as $column) {
@@ -218,13 +222,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
         }
-    
+
         if ($firstEditableColumn === null || !isset($_POST[$firstEditableColumn]) || !is_array($_POST[$firstEditableColumn])) {
             die("Invalid form submission. Please try again.");
         }
-        
+
         $primaryKeyIndex = count($_POST[$firstEditableColumn]) - 1;
-    
+
         foreach ($columns as $column) {
             if ($tableDefinitions[$table]['columns'][$column]['editable']) {
                 // Ensure the column field exists and is an array
@@ -235,21 +239,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-    
+
         // Validate foreign key dependencies
         if ($table === 'mitarbeiter' && !in_array($columnsValues['Lagernummer'], getDistinctValues('lager', 'Lagernummer'))) {
             die("Invalid Lagernummer. Please select a valid Lagernummer.");
         }
-    
+
         // Prepare columns and data for the query
         $columnsNames = implode(", ", array_map(function($col) { return "`$col`"; }, array_keys($columnsValues)));
         $columnsData = implode("', '", array_map(function($val) use ($db) { return $db->get_escape_string($val); }, $columnsValues));
         $query = "INSERT INTO `$table` ($columnsNames) VALUES ('$columnsData')";
-    
+
         // Execute the query
         $db->query($query);
     }
-    
+
     if (isset($_POST['delete'])) {
         $rowIndex = intval($_POST['delete']);
         $whereClause = [];
@@ -272,6 +276,7 @@ if (isset($_SESSION['last_query'])): ?>
 <?php endif; 
 ?>
 
+<!-- Navigation for selecting the table -->
 <ul class="hs-flex main-page-navigation">
     <?php foreach ($allowedTables as $allowedTable): ?>
         <li>
@@ -283,6 +288,7 @@ if (isset($_SESSION['last_query'])): ?>
     <?php endforeach; ?>
 </ul>
 
+<!-- Form for managing the table data -->
 <form method="POST" action="">
     <input type="hidden" name="table" value="<?= $table ?>">
     <table class="data-management-table">
@@ -319,7 +325,6 @@ if (isset($_SESSION['last_query'])): ?>
                             </th>
                         <?php endif; ?>
                     <?php endforeach; ?>
-                   
                 </tr>
             <?php endif; ?>
         </thead>
@@ -361,10 +366,9 @@ if (isset($_SESSION['last_query'])): ?>
                                     <?php if ($atLeastOneColumnEditable): ?>
                                         <button type="submit" name="update" value="<?= $rowIndex ?>">Aktualisieren</button>
                                     <?php endif; ?>  
-                                    <?php if ($tableDefinitions[$table]['deletable']&& $atLeastOneColumnEditable): ?>
+                                    <?php if ($tableDefinitions[$table]['deletable'] && $atLeastOneColumnEditable): ?>
                                         <button type="submit" name="delete" value="<?= $rowIndex ?>" onclick="return confirm('Are you sure?')">Löschen</button>
                                     <?php endif; ?>
-                                    
                                 </td>
                             <?php endif; ?>
                         </tr>
@@ -404,5 +408,19 @@ if (isset($_SESSION['last_query'])): ?>
 </form>
 
 <?php
-include 'footer.php';
+include 'footer.php'; // Include the footer component
 ?>
+
+<script>
+// Script to handle filter input changes
+document.addEventListener('DOMContentLoaded', function() {
+    const filterInputs = document.querySelectorAll('.table-filter-input');
+    filterInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const params = new URLSearchParams(window.location.search);
+            params.set(this.name, this.value);
+            window.location.search = params.toString();
+        });
+    });
+});
+</script>

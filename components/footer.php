@@ -1,8 +1,10 @@
 <div class="vs-container">
   
-  <!-- <br> -->
+  <!-- Horizontal flexible list for footer content -->
   <ul class="hs-flex">
+      <!-- Trademark paragraph -->
       <p class="trademark-p">&copy; AirLimited Ltd.</p>
+      <!-- Footer links -->
       <li><a href="#">Impressum</a></li>
       <li><a href="#">Service</a></li>
       <li><a href="#">Kontakt</a></li>
