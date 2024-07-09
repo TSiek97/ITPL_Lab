@@ -2,7 +2,13 @@
 
 require_once 'db_class.php';
 
-// Function to check if order items have a specific status
+/**
+ * Check if order items have a specific status.
+ *
+ * @param int $orderId The order ID.
+ * @param int $status The status to check.
+ * @return bool True if order items have the specified status, false otherwise.
+ */
 function hasOrderItemsWithStatus($orderId, $status) {
     global $db;
 
@@ -12,7 +18,13 @@ function hasOrderItemsWithStatus($orderId, $status) {
     return $result->count > 0;
 }
 
-// Function to adjust stock
+/**
+ * Adjust stock for a given artikelnummer.
+ *
+ * @param int $artikelnummer The product number.
+ * @param int $menge The quantity to adjust.
+ * @param bool $increase True to increase stock, false to decrease.
+ */
 function adjustStock($artikelnummer, $menge, $increase = true) {
     global $db;
 
@@ -42,6 +54,11 @@ function adjustStock($artikelnummer, $menge, $increase = true) {
     }
 }
 
+/**
+ * Update the status of teilauftraege based on stock changes.
+ *
+ * @param int $artikelnummer The product number.
+ */
 function updateTeilauftraegeStatus($artikelnummer) {
     global $db;
 
@@ -103,8 +120,11 @@ function updateTeilauftraegeStatus($artikelnummer) {
     }
 }
 
-
-// Function to cancel an order
+/**
+ * Cancel an order and adjust stock.
+ *
+ * @param int $orderId The order ID to cancel.
+ */
 function cancelOrder($orderId) {
     global $db;
 
@@ -125,7 +145,13 @@ function cancelOrder($orderId) {
     echo "Order $orderId has been canceled.";
 }
 
-// Function to cancel an order item
+/**
+ * Cancel an order item and adjust stock.
+ *
+ * @param int $orderId The order ID.
+ * @param int $teilauftrag The partial order ID.
+ * @param int $orderItemId The order item ID.
+ */
 function cancelOrderItem($orderId, $teilauftrag, $orderItemId) {
     global $db;
 
@@ -151,7 +177,11 @@ function cancelOrderItem($orderId, $teilauftrag, $orderItemId) {
     echo "Order item $orderItemId for order $orderId has been canceled.";
 }
 
-// Function to complete partial orders
+/**
+ * Complete partial orders by reducing stock and updating status.
+ *
+ * @param int $orderId The order ID.
+ */
 function completePartialOrder($orderId) {
     global $db;
 
@@ -182,8 +212,15 @@ function completePartialOrder($orderId) {
     }
 }
 
-// Function to update the status of an order item
-function updateOrderItemStatus($orderId,$orderItemId,$teilauftrag, $newStatus) {
+/**
+ * Update the status of an order item.
+ *
+ * @param int $orderId The order ID.
+ * @param int $orderItemId The order item ID.
+ * @param int $teilauftrag The partial order ID.
+ * @param int $newStatus The new status.
+ */
+function updateOrderItemStatus($orderId, $orderItemId, $teilauftrag, $newStatus) {
     global $db;
 
     // Get the artikelnummer, menge, and current status of the order item
@@ -191,8 +228,7 @@ function updateOrderItemStatus($orderId,$orderItemId,$teilauftrag, $newStatus) {
                         FROM auftragsposition 
                         WHERE position = $orderItemId 
                         AND auftragsnummer = $orderId 
-                        AND teilauftrag = $teilauftrag"
-                        ;
+                        AND teilauftrag = $teilauftrag";
     $item = $db->getEntity($query_get_item);
 
     if ($item) {
@@ -229,7 +265,12 @@ function updateOrderItemStatus($orderId,$orderItemId,$teilauftrag, $newStatus) {
     }
 }
 
-// Function to update the status of an order
+/**
+ * Update the status of an order.
+ *
+ * @param int $orderId The order ID.
+ * @param int $newStatus The new status.
+ */
 function updateOrderStatus($orderId, $newStatus) {
     global $db;
 
@@ -254,7 +295,11 @@ function updateOrderStatus($orderId, $newStatus) {
     $db->query($query_update_items);
 }
 
-// Function to auto-update the status of an order based on its items
+/**
+ * Automatically update the status of an order based on its items.
+ *
+ * @param int $orderId The order ID.
+ */
 function autoUpdateOrderStatus($orderId) {
     global $db;
 
@@ -331,6 +376,10 @@ function autoUpdateOrderStatus($orderId) {
         }
     }
 }
+
+/**
+ * Automatically update the status of all orders based on their items.
+ */
 function autoUpdateOrderStatusAll() {
     global $db;
 
@@ -344,7 +393,11 @@ function autoUpdateOrderStatusAll() {
     }
 }
 
-// Function to complete an order
+/**
+ * Complete an order by reducing stock and updating status.
+ *
+ * @param int $orderId The order ID to complete.
+ */
 function completeOrder($orderId) {
     global $db;
 
@@ -366,11 +419,15 @@ function completeOrder($orderId) {
     // Set status to 100 for auftraege where auftragsnummer = $orderId
     $query_update_order = "UPDATE auftraege SET status = 100 WHERE auftragsnummer = $orderId";
     $db->query($query_update_order);
-
-    
 }
 
-// Function to check if there is sufficient stock for a specific artikelnummer
+/**
+ * Check if there is sufficient stock for a specific artikelnummer.
+ *
+ * @param int $artikelnummer The product number.
+ * @param int $requiredMenge The required quantity.
+ * @return bool True if there is sufficient stock, false otherwise.
+ */
 function hasSufficientStock($artikelnummer, $requiredMenge) {
     global $db;
 
@@ -380,7 +437,11 @@ function hasSufficientStock($artikelnummer, $requiredMenge) {
     return $stock && $stock->Menge >= $requiredMenge;
 }
 
-// Function to set the status of teilauftraege to "Versendet"
+/**
+ * Set the status of teilauftraege to "Versendet".
+ *
+ * @param int $orderId The order ID.
+ */
 function setTeilauftraegeVersendet($orderId) {
     global $db;
 
@@ -397,7 +458,12 @@ function setTeilauftraegeVersendet($orderId) {
     autoUpdateOrderStatus($orderId);
 }
 
-// Function to check if there is sufficient stock for all items in an order
+/**
+ * Check if there is sufficient stock for all items in an order.
+ *
+ * @param int $orderId The order ID.
+ * @return bool True if there is sufficient stock for all items, false otherwise.
+ */
 function hasSufficientStockForOrder($orderId) {
     global $db;
 

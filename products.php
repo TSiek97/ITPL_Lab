@@ -1,6 +1,7 @@
-<?php include 'header.php' ?>
+<?php include 'header.php' // Include the header component ?>
 
 <div class="filter-row">
+    <!-- Search input and filter button -->
     <input type="text" class="filter-input" id="searchInput" placeholder="Produkt Suchen...">
     <button class="button-style-1" id="filterButton">Produkte Filtern</button>
     <div id="backdrop" class="backdrop"></div>
@@ -9,20 +10,15 @@
         <form id="filterForm" method="GET" action="">
             <h4>Kategorien</h4>
             <?php
-            // require_once "db_class.php";
-            // $DBServer   = 'localhost';
-            // $DBHost     = 'airlimited';
-            // $DBUser     = 'root';
-            // $DBPassword = '';
-
-            // $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-            // $db->connect();
+            // Fetch distinct categories from the 'artikel' table
             $query_categories = 'SELECT DISTINCT Kategorie FROM artikel;';
             $categories = $db->getEntityArray($query_categories);
 
+            // Get selected filter categories and availability from the GET request
             $filter_categories = isset($_GET['categories']) ? $_GET['categories'] : [];
             $availability = isset($_GET['availability']) ? $_GET['availability'] : '';
 
+            // Display checkboxes for each category
             foreach ($categories as $category) {
                 $categoryName_underscores = $category->Kategorie;
                 $categoryName = str_replace("_", " ", $categoryName_underscores);
@@ -32,6 +28,7 @@
             }
             ?>
             <h4>Status</h4>
+            <!-- Availability checkbox -->
             <input type="checkbox" id="available" name="availability" value="Lagernd" <?php echo $availability === 'Lagernd' ? 'checked' : ''; ?>>
             <label for="available">Lagernd</label><br>
 
@@ -42,16 +39,18 @@
 
 <div class="product-card-container" id="productContainer">
     <?php
-   
+    // Prepare category filter for SQL query
     $category_filter = !empty($filter_categories) ? "('" . implode("','", array_map(function($category) {
         return str_replace(" ", "_", addslashes($category));
     }, $filter_categories)) . "')" : "";
- 
+
+    // Prepare availability filter for SQL query
     $availability_filter = $availability === 'Lagernd' ? "HAVING Menge > 0" : "";
 
+    // SQL query to fetch products based on selected filters
     if (!empty($category_filter)) {
         $query_products_by_category = "
-            SELECT artikel.artikelnummer, artikel.artikelbezeichnung,artikel.Kategorie, artikel.einzelpreis, SUM(lagerplatz.Menge) AS Menge
+            SELECT artikel.artikelnummer, artikel.artikelbezeichnung, artikel.Kategorie, artikel.einzelpreis, SUM(lagerplatz.Menge) AS Menge
             FROM artikel
             LEFT JOIN lagerplatz ON artikel.artikelnummer = lagerplatz.artikelnummer
             WHERE artikel.Kategorie IN $category_filter
@@ -60,7 +59,7 @@
         ";
     } else {
         $query_products_by_category = "
-            SELECT artikel.artikelnummer, artikel.artikelbezeichnung,artikel.Kategorie, artikel.einzelpreis, SUM(lagerplatz.Menge) AS Menge
+            SELECT artikel.artikelnummer, artikel.artikelbezeichnung, artikel.Kategorie, artikel.einzelpreis, SUM(lagerplatz.Menge) AS Menge
             FROM artikel
             LEFT JOIN lagerplatz ON artikel.artikelnummer = lagerplatz.artikelnummer
             GROUP BY artikel.artikelnummer
@@ -68,9 +67,10 @@
         ";
     }
 
-    $products_by_category = $db->getEntityArray($query_products_by_category);
+    $products_by_category = $db->getEntityArray($query_products_by_category); // Execute the query
 
     $directory = "product-pictures";
+    // Display product cards
     foreach ($products_by_category as $product) {
         $productNummer = $product->artikelnummer;
         $productKategorie = $product->Kategorie;
@@ -92,6 +92,7 @@
 </div>
 
 <script>
+// Filter form submission event listener
 document.getElementById('filterForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
@@ -116,6 +117,7 @@ document.getElementById('filterForm').addEventListener('submit', function(event)
     window.location.href = newUrl;
 });
 
+// Search input event listener
 document.getElementById('searchInput').addEventListener('input', function() {
     const searchValue = this.value.trim().toLowerCase(); // Trim whitespace and convert to lowercase
     const products = document.querySelectorAll('.product-card');
@@ -140,9 +142,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
         }
     });
 });
-
-
-
 </script>
 
-<?php include 'footer.php' ?>
+<?php include 'footer.php' // Include the footer component ?>

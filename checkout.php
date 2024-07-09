@@ -1,19 +1,14 @@
 <?php
-include 'header.php';
-require_once 'functions/cart_functions.php';
-require_once 'functions/checkout-add-auftrag.php';
+include 'header.php'; // Include the header component
+require_once 'functions/cart_functions.php'; // Include cart functions
+require_once 'functions/checkout-add-auftrag.php'; // Include checkout add auftrag functions
+
+// Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-// // Database connection details
-// $DBServer   = 'localhost';
-// $DBHost     = 'airlimited';
-// $DBUser     = 'root';
-// $DBPassword = '';
-// $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
-// $db->connect();
 
-// Fetch cart items for the logged-in servicepartner
+// Fetch cart items for the logged-in service partner
 $servicepartnernummer = $_SESSION['userID'];
 $orderItems = get_cart_items($servicepartnernummer);
 
@@ -25,13 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['quantity']) && isset($_POST['productNummer']) && isset($_POST['add_to_cart'])) {
         $productNummer = $_POST['productNummer'];
         $quantity = intval($_POST['quantity']);
-        add_to_cart($productNummer, $quantity);
+        add_to_cart($productNummer, $quantity); // Update the cart with the new quantity
         header('Location: checkout.php'); // Refresh to reflect changes
         exit();
     } elseif (isset($_POST['productNummer']) && isset($_POST['remove_from_cart'])) {
         $productNummer = $_POST['productNummer'];
-        remove_from_cart($productNummer);
-
+        remove_from_cart($productNummer); // Remove the item from the cart
         header('Location: checkout.php'); // Refresh to reflect changes
         exit();
     }
@@ -80,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.quantity-input').forEach(function(input) {
         input.addEventListener('change', function() {
             var form = input.closest('form');
-            form.submit();
+            form.submit(); // Submit the form when the quantity is changed
         });
     });
 });
@@ -146,13 +140,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" id="fill-button" disabled>Füllen</button>
                 <button type="submit" id="add-to-cart-button" disabled>Bestellung abschließen</button>
             </form>
-
         </div>
     </div>
 </div>
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
     const kundennummerInput = document.getElementById('kundennummer');
     const nameInput = document.getElementById('name');
@@ -164,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let timeout = null;
     let customerData = [];
 
+    // Function to validate the form
     function validateForm() {
         const allFieldsFilled = kundennummerInput.value && nameInput.value && addressInput.value && zipInput.value;
         const validCustomer = customerData.length === 1;
@@ -171,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fillButton.disabled = !validCustomer;
     }
 
+    // Function to fill the form with customer data
     function fillForm() {
         if (customerData.length === 1) {
             const customer = customerData[0];
@@ -182,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Function to fetch customer data from the server
     function fetchCustomers() {
         const kundennummer = kundennummerInput.value;
         const name = nameInput.value;
@@ -197,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error fetching customer data:', error));
     }
 
+    // Handle input changes to fetch customer data
     function handleInput() {
         clearTimeout(timeout);
         timeout = setTimeout(fetchCustomers, 300);
@@ -208,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
     zipInput.addEventListener('input', handleInput);
     fillButton.addEventListener('click', fillForm);
 });
-
 </script>
 
-<?php include 'footer.php'; ?>
+<?php include 'footer.php'; // Include the footer component ?>

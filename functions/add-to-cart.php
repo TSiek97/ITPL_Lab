@@ -1,12 +1,15 @@
 <?php
-//include '../header.php'; // Adjust the path as needed
-require_once '../db_class.php'; // Adjust the path as needed
+
+require_once '../db_class.php'; 
+
+// Start a session if none exists
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check if the user is a servicepartner
+    // Check if the user is a service partner
     if (isset($_SESSION['userType']) && $_SESSION['userType'] == 'servicepartner') {
         // Retrieve form data
         $quantity = intval($_POST['quantity']);
@@ -19,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $DBUser     = 'root';
         $DBPassword = '';
 
+        // Create a new database connection
         $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
         $db->connect();
 
-        // Check if the item is already in the cart
+        // Query to check if the item is already in the cart
         $query_check_item = "
             SELECT Position, Menge
             FROM warenkorb
@@ -36,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $new_quantity = $existing_item->Menge + $quantity;
             $position = $existing_item->Position;
 
+            // Query to update the item quantity in the cart
             $query_update_quantity = "
                 UPDATE warenkorb
                 SET Menge = $new_quantity
@@ -54,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $result = $db->getEntity($query_get_position);
             $next_position = $result->next_position;
 
+            // Query to add the new item to the cart
             $query_add_to_cart = "
                 INSERT INTO warenkorb (Servicepartnernummer, Artikelnummer, Menge, Position)
                 VALUES ($servicepartnernummer, $artikelnummer, $quantity, $next_position)

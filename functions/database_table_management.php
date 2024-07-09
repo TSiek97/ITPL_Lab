@@ -1,5 +1,5 @@
 <?php
-
+/*
 require_once __DIR__ . '/../db_class.php'; // Adjusted the path to use an absolute path
 
 // Ensure that the global $db variable is initialized
@@ -156,5 +156,5 @@ function handleTableOperations() {
 
 // Call handleTableOperations to process any pending operations
 handleTableOperations();
-
+*/
 ?>

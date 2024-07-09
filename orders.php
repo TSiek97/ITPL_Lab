@@ -1,5 +1,5 @@
 <?php
-include 'header.php';
+include 'header.php'; // Include the header component
 
 // Check if userType is set in the session
 if (isset($_SESSION['userType'])) {
@@ -11,48 +11,49 @@ if (isset($_SESSION['userType'])) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_POST['completeOrder'])) {
             $orderId = $_POST['orderId'];
-            completePartialOrder($orderId);
-            header("Location: orders.php");
+            completePartialOrder($orderId); // Complete the partial order
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['completeFullOrder'])) {
             $orderId = $_POST['orderId'];
-            completeOrder($orderId);
-            header("Location: orders.php");
+            completeOrder($orderId); // Complete the full order
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['cancelOrder'])) {
             $orderId = $_POST['orderId'];
-            cancelOrder($orderId);
-            header("Location: orders.php");
+            cancelOrder($orderId); // Cancel the order
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['cancelOrderItem'])) {
             $orderItemId = $_POST['orderItemId'];
             $orderId = $_POST['orderId'];
             $teilauftrag = $_POST['teilauftrag'];
-            cancelOrderItem($orderId, $teilauftrag, $orderItemId);
-            header("Location: orders.php");
+            cancelOrderItem($orderId, $teilauftrag, $orderItemId); // Cancel the order item
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['updateOrderStatus'])) {
             $orderId = $_POST['orderId'];
             $newStatus = $_POST['updateOrderStatus'];
-            updateOrderStatus($orderId, $newStatus);
-            header("Location: orders.php");
+            updateOrderStatus($orderId, $newStatus); // Update the order status
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['updateOrderItemStatus'])) {
             $orderId = $_POST['orderId'];
             $orderItemId = $_POST['orderItemId'];
             $teilauftrag = $_POST['teilauftrag'];
             $newStatus = $_POST['updateOrderItemStatus'];
-            updateOrderItemStatus($orderId,$orderItemId,$teilauftrag, $newStatus);
-            header("Location: orders.php");
+            updateOrderItemStatus($orderId, $orderItemId, $teilauftrag, $newStatus); // Update the order item status
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['setTeilauftraegeVersendet'])) {
             $orderId = $_POST['orderId'];
-            setTeilauftraegeVersendet($orderId);
-            header("Location: orders.php");
+            setTeilauftraegeVersendet($orderId); // Set partial orders as sent
+            header("Location: orders.php"); // Redirect to orders page
             exit;
         }
     }
 
+    // Display grid headers for order overview
     echo '<div class="grid-content grid-content-header">';
     echo '    <div class="grid-item">Auftragsnummer</div>'; 
     echo '    <div class="grid-item">Gesamtpreis</div>'; 
@@ -64,7 +65,7 @@ if (isset($_SESSION['userType'])) {
     echo '    <div class="grid-item">Lieferdatum</div>'; 
     echo '    <div class="grid-item">Beschreibung</div>'; 
     echo '    <div class="grid-item">Adresse</div>'; 
-    if (($userType == "servicepartner") || ($userType == "management")) {
+    if ($userType == "servicepartner" || $userType == "management") {
         echo '    <div class="grid-item">';
             if ($userType == "servicepartner") {
                 echo 'Kundennummer';
@@ -75,8 +76,10 @@ if (isset($_SESSION['userType'])) {
     }
     echo '    <div class="grid-item">Aktionen</div>'; 
     echo '</div>';
-    autoUpdateOrderStatusAll();
-    // Get data for Auftragsübersicht
+
+    autoUpdateOrderStatusAll(); // Automatically update order status
+
+    // Query to get data for order overview
     $query_aufträge = "
     SELECT auftraege.auftragsnummer, 
         ROUND(SUM(auftragsposition.Menge * artikel.Einzelpreis),2) AS gesamtpreis, 
@@ -104,6 +107,8 @@ if (isset($_SESSION['userType'])) {
         GROUP BY auftraege.auftragsnummer, auftraege.eingangsdatum, auftraege.abschlussdatum, auftraege.lieferdatum, statusbeschreibung.beschreibung, auftraege.status, auftraege.Lieferadresse_straße, auftraege.Lieferadresse_Hausnummer, auftraege.Lieferadresse_postleitzahl, auftraege.Kundennummer, auftraege.bearbeiternummer
         ORDER BY auftraege.status ASC, auftraege.eingangsdatum DESC, auftraege.auftragsnummer DESC
     ";
+
+    // Query to get data for order items
     $query_auftragspositionen = "
     SELECT auftragsposition.position, auftragsposition.teilauftrag, artikel.artikelbezeichnung, 
         ROUND(artikel.Einzelpreis, 2) AS Kaufpreis, 
@@ -112,7 +117,8 @@ if (isset($_SESSION['userType'])) {
         auftragsposition.status, 
         auftraege.auftragsnummer,
         artikel.artikelnummer,
-        COALESCE((SELECT SUM(lagerplatz.Menge) FROM lagerplatz WHERE lagerplatz.Artikelnummer = auftragsposition.artikelnummer), 0) AS Vorrat    FROM auftragsposition 
+        COALESCE((SELECT SUM(lagerplatz.Menge) FROM lagerplatz WHERE lagerplatz.Artikelnummer = auftragsposition.artikelnummer), 0) AS Vorrat    
+    FROM auftragsposition 
     LEFT JOIN auftraege ON auftragsposition.auftragsnummer = auftraege.auftragsnummer 
     LEFT JOIN artikel ON auftragsposition.artikelnummer = artikel.artikelnummer
     LEFT JOIN statusbeschreibung ON auftragsposition.status = statusbeschreibung.status";
@@ -127,13 +133,11 @@ if (isset($_SESSION['userType'])) {
     $auftragspositionen_data = $db->getEntityArray($query_auftragspositionen);
 
     if (!empty($auftragsuebersicht_data)) {
-        // Loop through $auftragsuebersicht_data
+        // Loop through $auftragsuebersicht_data to display order details
         foreach ($auftragsuebersicht_data as $index => $data) {
             $contentId = 'hidden-content' . $index;
 
-            // Update order status on page load
-            // autoUpdateOrderStatus($data->auftragsnummer);
-
+            // Display order details in a clickable container
             echo '<div class="clickable-container" onclick="toggleContent(\'' . $contentId . '\')">';
             echo '<div class="grid-container">';
                 echo '<div class="grid-content">';
@@ -156,6 +160,7 @@ if (isset($_SESSION['userType'])) {
                         echo '<form method="POST" action="orders.php">';
                         echo '<input type="hidden" name="orderId" value="' . ($data->auftragsnummer ?? '') . '">';
                         
+                        // Display action buttons based on user type and order status
                         if ($userType == "servicepartner" || $userType == "management") {
                             if (hasOrderItemsWithStatus($data->auftragsnummer, 30)) {
                                 echo '<button class="ship" type="submit" name="completeOrder"></button>';
@@ -176,15 +181,15 @@ if (isset($_SESSION['userType'])) {
                             echo '<button class=".installation-done" type="submit" name="completeFullOrder"></button>';
                         }
                         echo '</form>';
-                    echo '</div>';//grid-item   
-                echo '</div>';//grid-content
+                    echo '</div>'; // grid-item   
+                echo '</div>'; // grid-content
 
-            // Loop through $auftragspositionen_data for additional content
+                // Loop through $auftragspositionen_data for additional content
                 if (!empty($auftragspositionen_data)) {
                     echo '<div class="hidden-content" id="' . $contentId . '" style="display: none;">';
                     foreach ($auftragspositionen_data as $position) {
                         if (isset($position->auftragsnummer) && $position->auftragsnummer == $data->auftragsnummer) {
-                            
+                            // Display order item details
                             echo '<div class="grid-row">';
                                 echo '<div class="grid-item"><a href="product-view.php?product=' . ($position->artikelnummer ?? '') . '">' . ($position->artikelbezeichnung ?? '') . '</a></div>';
                                 echo '<div class="grid-item">' . ($position->Kaufpreis ?? '') . ' €</div>';
@@ -196,11 +201,11 @@ if (isset($_SESSION['userType'])) {
                                 echo '<div class="grid-item"></div>';
                                 echo '<div class="grid-item">' . ($position->beschreibung ?? '') . '</div>';
                                 echo '<div class="grid-item"></div>';
-                                if ($userType != "lager"){
+                                if ($userType != "lager") {
                                     echo '<div class="grid-item"></div>';
                                 }
-                                
 
+                                // Display action buttons based on user type and order item status
                                 echo '<div class="grid-item">';
                                     echo '<form method="POST" action="orders.php">';
                                     echo '<input type="hidden" name="orderId" value="' . ($position->auftragsnummer ?? '') . '">';
@@ -213,38 +218,31 @@ if (isset($_SESSION['userType'])) {
                                     if ($position->status < 100) {
                                         echo '<button class="round-cancel" type="submit" name="cancelOrderItem"></button>';
                                     }
-                                    
                                     echo '</form>';
                                 echo '</div>';
                             echo '</div>'; 
-                        
-                            
                         }
-                        
                     }
-                   
+                    
                 }
                 echo '</div>';
                 echo '</div>';
-     
-                echo '</div>';
+            echo '</div>';
         }
-       
     } else {
         // Handle case when $auftragsuebersicht_data is empty
         echo "No data available.";
     }
-    
-
 } else {
     // Handle case when userType is not set in the session
     echo "UserType not found in session.";
 }
 
-include 'footer.php';
+include 'footer.php'; // Include the footer component
 ?>
 
 <script>
+// Function to toggle the visibility of content sections
 function toggleContent(contentId) {
     var content = document.getElementById(contentId);
     if (content) {
@@ -252,4 +250,3 @@ function toggleContent(contentId) {
     }
 }
 </script>
-
