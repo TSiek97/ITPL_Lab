@@ -33,6 +33,11 @@
                         <!-- Forgot password link -->
                         <span class="psw"><a href="#">Passwort vergessen?</a></span>
                     </div>
+                    <?php if (isset($_GET['error'])): ?>
+                    <div class="error-message">
+                        <p>Benutzer/ Passwort ist falsch</p>
+                    </div>
+                <?php endif; ?>
                 </form>
             </div>
         </div>
@@ -45,6 +50,8 @@ session_start(); // Start session
 // Include database connection
 require_once "db_class.php";
 
+
+# hallo -> 598d4c200461b81522a3328565c25f7c   > default for showcase
 // Database connection parameters
 $DBServer   = 'localhost';
 $DBHost     = 'airlimited';
@@ -62,54 +69,47 @@ $userName = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_POST['psw'])) {
     // Retrieve username/email and password from the login form
     $uname = $_POST['uname'];
-    $psw = $_POST['psw'];
+    $password = $_POST['psw'];
+    $hashedPassword = md5($password);
 
-    // Check if username/email exists in the 'kunde' table
-    $query = "SELECT * FROM kunde WHERE `E-Mailadresse` = '$uname'";
+    // Check 'servicepartner' table
+    $query = "SELECT Bearbeiternummer, Firmenname FROM servicepartner WHERE `E-Mailadresse` = '$uname' AND `Passwort_hash` = '$hashedPassword'";
     $result = $db->getEntityArray($query);
-
+    
     if (!empty($result)) {
-        // User found in the 'kunde' table
-        $userType = "kunde";
+        // User found in the 'servicepartner' table
+        $userType = "servicepartner";
         $row = $result[0]; // Assuming only one row is returned
-        $userID = $row->Kundennummer; // Accessing the property directly
+        $userID = $row->Bearbeiternummer; // Accessing the property directly
+        $userName = $row->Firmenname;
     } else {
-        // Check 'servicepartner' table
-        $query = "SELECT * FROM servicepartner WHERE `E-Mailadresse` = '$uname'";
+        // Check 'mitarbeiter' table
+        $query = "SELECT Mitarbeiternummer, Rechte, Vorname, Nachname FROM mitarbeiter WHERE Kennung = '$uname' AND `Passwort_hash` = '$hashedPassword'";
         $result = $db->getEntityArray($query);
         
         if (!empty($result)) {
-            // User found in the 'servicepartner' table
-            $userType = "servicepartner";
+            // User found in the 'mitarbeiter' table
             $row = $result[0]; // Assuming only one row is returned
-            $userID = $row->Bearbeiternummer; // Accessing the property directly
-            $userName = $row->Firmenname;
-        } else {
-            // Check 'mitarbeiter' table
-            $query = "SELECT Mitarbeiternummer, Rechte, Vorname, Nachname FROM mitarbeiter WHERE Kennung = '$uname'";
-            $result = $db->getEntityArray($query);
+            $userID = $row->Mitarbeiternummer; // Accessing the property directly
+            $rechte = $row->Rechte;
+            $userName = (string)$row->Vorname . ' ' . (string)$row->Nachname;
             
-            if (!empty($result)) {
-                // User found in the 'mitarbeiter' table
-                $row = $result[0]; // Assuming only one row is returned
-                $userID = $row->Mitarbeiternummer; // Accessing the property directly
-                $rechte = $row->Rechte;
-                $userName = (string)$row->Vorname . ' ' . (string)$row->Nachname;
-                
-                // Determine user type based on rights
-                if ($rechte === 'management') {
-                    $userType = "management";
-                } else if ($rechte === 'fertigung') {
-                    $userType = "fertigung";
-                } else if ($rechte === 'lager') {
-                    $userType = "lager";
-                }
-            } else {
-                // User not found, handle login failure
-                echo "Benutzer nicht gefunden.";
+            // Determine user type based on rights
+            if ($rechte === 'management') {
+                $userType = "management";
+            } else if ($rechte === 'fertigung') {
+                $userType = "fertigung";
+            } else if ($rechte === 'lager') {
+                $userType = "lager";
             }
+        } else {
+            // User not found, handle login failure
+            echo "Benutzer nicht gefunden.";
+            header("Location: login.php?error=$hashedPassword");
+            
         }
     }
+ 
 
     // Set session variables if user is authenticated
     if (isset($userType) && isset($userID)) {
@@ -120,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['uname']) && isset($_PO
         // Redirect to home page or any other page
         header("Location: home.php");
         exit();
+    } else {
+        header("Location: login.php?error=$hashedPassword");
     }
 }
 ?>

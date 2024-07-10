@@ -1,7 +1,9 @@
 <?php
 include 'header.php'; // Include the header component
 require_once 'db_class.php'; // Include the database connection class
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Get the user type from the session if set
 $userType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 

@@ -46,40 +46,47 @@ if (isset($_SESSION['userType'])) {
 
         // Query to get data for production orders overview
         $query_fertigungsaufträge = "
-            SELECT 
-                fertigungsauftraege.fertigungsnummer, 
-                fertigungsauftraege.menge, 
-                fertigungsauftraege.fertigungsdatum, 
-                fertigungsauftraege.fertigungsziel, 
-                fertigungsauftraege.auftragseingang,
-                fertigungsauftraege.prio,
-                artikel.artikelbezeichnung, 
-                artikel.artikelnummer,
-                artikel.Fertigungsart,
-                statusbeschreibung.beschreibung 
-            FROM fertigungsauftraege 
-            LEFT JOIN artikel 
-                ON fertigungsauftraege.artikelnummer = artikel.artikelnummer 
-            LEFT JOIN statusbeschreibung 
-                ON fertigungsauftraege.status = statusbeschreibung.status
-            ORDER BY 
-                CASE statusbeschreibung.beschreibung 
-                    WHEN 'abgeschlossen' THEN 3
-                    WHEN 'storniert' THEN 3
-                    ELSE 1
-                END ASC,
-                CASE fertigungsauftraege.prio
-                    WHEN 'Hoch' THEN 1 
-                    WHEN 'Mittel' THEN 2 
-                    WHEN 'Niedrig' THEN 3 
-                    ELSE 4 
-                END ASC,
-                CASE fertigungsauftraege.fertigungsziel 
-                    WHEN 'Kunde' THEN 1 
-                    WHEN 'Lager' THEN 2 
-                    ELSE 3
-                END ASC,
-                auftragseingang DESC";
+        SELECT 
+            fertigungsauftraege.fertigungsnummer, 
+            fertigungsauftraege.menge, 
+            fertigungsauftraege.fertigungsdatum, 
+            fertigungsauftraege.fertigungsziel, 
+            fertigungsauftraege.auftragseingang,
+            fertigungsauftraege.prio,
+            artikel.artikelbezeichnung, 
+            artikel.artikelnummer,
+            artikel.Fertigungsart,
+            statusbeschreibung.beschreibung 
+        FROM fertigungsauftraege 
+        LEFT JOIN artikel 
+            ON fertigungsauftraege.artikelnummer = artikel.artikelnummer 
+        LEFT JOIN statusbeschreibung 
+            ON fertigungsauftraege.status = statusbeschreibung.status";
+    
+    if ($userType == "fertigung") {
+        $query_fertigungsaufträge .= " 
+        WHERE statusbeschreibung.beschreibung NOT IN ('abgeschlossen', 'storniert')";
+    }
+    
+    $query_fertigungsaufträge .= "
+        ORDER BY 
+            CASE statusbeschreibung.beschreibung 
+                WHEN 'abgeschlossen' THEN 2
+                WHEN 'storniert' THEN 3
+                ELSE 1
+            END ASC,
+            CASE fertigungsauftraege.prio
+                WHEN 'Hoch' THEN 1 
+                WHEN 'Mittel' THEN 2 
+                WHEN 'Niedrig' THEN 3 
+                ELSE 4 
+            END ASC,
+            CASE fertigungsauftraege.fertigungsziel 
+                WHEN 'Kunde' THEN 1 
+                WHEN 'Lager' THEN 2 
+                ELSE 3
+            END ASC,
+            auftragseingang DESC";
 
         $fertigungsuebersicht_data = $db->getEntityArray($query_fertigungsaufträge);
         if (is_array($fertigungsuebersicht_data)) {

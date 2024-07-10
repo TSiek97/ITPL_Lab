@@ -1,5 +1,7 @@
 <?php
-session_start(); // Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+} // Ensure session is started
 
 // Determine the current page
 $current_page = basename($_SERVER['PHP_SELF']);
