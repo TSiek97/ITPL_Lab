@@ -18,6 +18,13 @@ $db = new DBConnector($DBServer, $DBHost, $DBUser, $DBPassword);
 $db->connect();
 ?>
 <body>
+    <?php 
+        session_start();
+        if (!isset($_SESSION['userType'])) {
+            header("Location: login.php");
+            exit();
+        }
+     ?>
     <div id="container">
 
         <div id='header-wrapper'>

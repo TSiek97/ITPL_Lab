@@ -182,7 +182,7 @@ function cancelOrderItem($orderId, $teilauftrag, $orderItemId) {
  *
  * @param int $orderId The order ID.
  */
-function completePartialOrder($orderId) {
+function allowSendPartialOrder($orderId) {
     global $db;
 
     // Select all teilaufträge which are 'Kommissioniert' (status 30)
@@ -398,7 +398,7 @@ function autoUpdateOrderStatusAll() {
  *
  * @param int $orderId The order ID to complete.
  */
-function completeOrder($orderId) {
+function completeFullOrder($orderId) {
     global $db;
 
     // Get the artikelnummer and menge of the order items

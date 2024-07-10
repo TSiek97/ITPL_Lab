@@ -9,14 +9,14 @@ if (isset($_SESSION['userType'])) {
 
     // Handle form submissions for completing or canceling orders
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        if (isset($_POST['completeOrder'])) {
+        if (isset($_POST['allowSendPartialOrder'])) {
             $orderId = $_POST['orderId'];
-            completePartialOrder($orderId); // Complete the partial order
+            allowSendPartialOrder($orderId); // Complete the partial order
             header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['completeFullOrder'])) {
             $orderId = $_POST['orderId'];
-            completeOrder($orderId); // Complete the full order
+            completeFullOrder($orderId); // Complete the full order
             header("Location: orders.php"); // Redirect to orders page
             exit;
         } elseif (isset($_POST['cancelOrder'])) {
@@ -91,11 +91,13 @@ if (isset($_SESSION['userType'])) {
         COALESCE(SUM(auftragsposition.Menge), 0) AS menge,
         CONCAT(auftraege.Lieferadresse_straße, ' ', auftraege.Lieferadresse_Hausnummer, ', ', auftraege.Lieferadresse_postleitzahl) AS adresse,
         auftraege.Kundennummer,
-        auftraege.bearbeiternummer
+        auftraege.bearbeiternummer,
+        kunde.VIP
     FROM auftraege 
     LEFT JOIN auftragsposition ON auftraege.auftragsnummer = auftragsposition.auftragsnummer
     LEFT JOIN artikel ON auftragsposition.artikelnummer = artikel.artikelnummer
-    LEFT JOIN statusbeschreibung ON auftraege.status = statusbeschreibung.status ";
+    LEFT JOIN statusbeschreibung ON auftraege.status = statusbeschreibung.status
+    LEFT JOIN kunde ON auftraege.Kundennummer = kunde.Kundennummer ";
 
     if ($userType == "servicepartner") {
         $query_aufträge .= " WHERE auftraege.bearbeiternummer = $userID";
@@ -105,9 +107,25 @@ if (isset($_SESSION['userType'])) {
 
     $query_aufträge .= "
         GROUP BY auftraege.auftragsnummer, auftraege.eingangsdatum, auftraege.abschlussdatum, auftraege.lieferdatum, statusbeschreibung.beschreibung, auftraege.status, auftraege.Lieferadresse_straße, auftraege.Lieferadresse_Hausnummer, auftraege.Lieferadresse_postleitzahl, auftraege.Kundennummer, auftraege.bearbeiternummer
-        ORDER BY auftraege.status ASC, auftraege.eingangsdatum DESC, auftraege.auftragsnummer DESC
     ";
-
+    // $query_aufträge .= "
+    // ORDER BY auftraege.status ASC, auftraege.eingangsdatum DESC, auftraege.auftragsnummer DESC
+    // ";
+    $query_aufträge .= "
+    ORDER BY 
+                CASE statusbeschreibung.beschreibung
+                    WHEN 'abgeschlossen' THEN 2
+                    WHEN 'storniert' THEN 3
+                    ELSE 1
+                END ASC,
+                CASE kunde.VIP
+                    WHEN 'JA' THEN 1
+                    WHEN 'NEIN' THEN 2
+                    ELSE 3
+                END ASC,
+                auftraege.status DESC,
+                auftraege.eingangsdatum DESC;
+            ";
     // Query to get data for order items
     $query_auftragspositionen = "
     SELECT auftragsposition.position, auftragsposition.teilauftrag, artikel.artikelbezeichnung, 
@@ -163,7 +181,7 @@ if (isset($_SESSION['userType'])) {
                         // Display action buttons based on user type and order status
                         if ($userType == "servicepartner" || $userType == "management") {
                             if (hasOrderItemsWithStatus($data->auftragsnummer, 30)) {
-                                echo '<button class="ship" type="submit" name="completeOrder"></button>';
+                                echo '<button class="ship" type="submit" name="sendPartialOrder"></button>';
                             }
                         } elseif ($userType == "lager") {
                             if ($data->status == 20 && hasSufficientStockForOrder($data->auftragsnummer)) {
@@ -174,11 +192,11 @@ if (isset($_SESSION['userType'])) {
                                 echo '<button class="ship" type="submit" name="setTeilauftraegeVersendet"></button>';
                             }
                         }
-                        if ($data->status < 100) {
+                        if ($data->status < 80) {
                             echo '<button class="round-cancel" type="submit" name="cancelOrder"></button>';
                         }
                         if ($data->status == 75) {
-                            echo '<button class=".installation-done" type="submit" name="completeFullOrder"></button>';
+                            echo '<button class="installation-done" type="submit" name="completeFullOrder"></button>';
                         }
                         echo '</form>';
                     echo '</div>'; // grid-item   
@@ -215,7 +233,7 @@ if (isset($_SESSION['userType'])) {
                                     if ($userType == "lager" && $position->status == 20 && hasSufficientStock($position->artikelnummer, $position->Menge)) {
                                         echo '<button class="comissioned" type="submit" name="updateOrderItemStatus" value="30"></button>';
                                     }
-                                    if ($position->status < 100) {
+                                    if ($position->status < 80) {
                                         echo '<button class="round-cancel" type="submit" name="cancelOrderItem"></button>';
                                     }
                                     echo '</form>';
